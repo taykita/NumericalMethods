@@ -1,4 +1,4 @@
-package org.example;
+package org.example.sip;
 
 public class MainClass {
 

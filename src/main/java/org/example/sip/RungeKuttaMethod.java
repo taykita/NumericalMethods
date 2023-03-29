@@ -1,4 +1,4 @@
-package org.example;
+package org.example.sip;
 
 public class RungeKuttaMethod {
     public static double K1(double step, Уравнение уравнение, double x1, double x2) {
