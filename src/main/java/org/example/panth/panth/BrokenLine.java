@@ -1,5 +1,5 @@
 package org.example.panth.panth;
-
+//f\left(x\right)=64.4501\cdot\sin\left(12.1478\cdot x\ +\ 202.8204\right)\ +17.5999\cdot e^{0.0806\cdot x}\
 public class BrokenLine {
     private static final double a = 0.0806;
     private static final double b = 12.1478;
@@ -13,7 +13,7 @@ public class BrokenLine {
 
     private static double J(double u) {
         double res = d * Math.sin(b * u + e) + c * Math.exp(a * u);
-        return -res;
+        return res;
     }
 
     private static double g(double u, double v) {
@@ -25,7 +25,7 @@ public class BrokenLine {
     }
 
     public static void main(String[] args) {
-        double xOpt = minJ(0, 5);
+        double xOpt = minJ(0, 0.5);
         System.out.printf("u = %f, f(u) = %f\n", xOpt, J(xOpt));
     }
 
@@ -40,8 +40,10 @@ public class BrokenLine {
 
             if (J(x1) < J(x2)) {
                 xOpt = x1;
+                System.out.println(xOpt);
             } else {
                 xOpt = x2;
+                System.out.println(xOpt);
             }
             p = (J(xOpt) + p) / 2;
             delta = (J(xOpt) - p) / (2 * L);
