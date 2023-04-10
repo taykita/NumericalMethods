@@ -1,5 +1,8 @@
 package org.example.sip;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.lang.Math.abs;
 
 public class AdamsMethod {
@@ -21,6 +24,23 @@ public class AdamsMethod {
         }
     }
 
+    public static class ПараXY {
+        public double x;
+        public double y;
+
+        public ПараXY(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public String toString() {
+            return "ПараXY{" +
+                    "x=" + x +
+                    ", y=" + y +
+                    '}';
+        }
+    }
     /**
      alpha  beta   x      y
      1,00   1,00   0,00   0,000000
@@ -71,13 +91,27 @@ public class AdamsMethod {
      1,00   1,00   0,90   0,6622995007
      */
 
+
     public static void main(String[] args) {
-        System.out.println((0.55178568984823 - 0.55178285031142)/7);
-        System.out.println((0.66226713587187 - 0.66226810558424)/7);
-        System.out.println((0.65328515644593 - 0.65330357389020)/7);
+        //1,00   1,00   0,7000   0,56299930244743
+        System.out.println((0.56299930244743 - 0.56298491605309)/7);
+        System.out.println((0.56463398888755 - 0.56343036647475)/7);
+
+        double step = 0.01;
+
+        List<ПараXY> adamsIntra = getAdamsIntra(step);
+        List<ПараXY> adamsIntraDiv2 = getAdamsIntra(step/2);
+//        List<ПараXY> adamsExtra = getAdamsExtra(step);
+
+        for (int i = 0; i < adamsIntra.size() - 1; i++) {
+            System.out.println(adamsIntra.get(i) + " " + adamsIntraDiv2.get(i*2 + 2));
+            System.out.println(adamsIntra.get(i).y - adamsIntraDiv2.get(i*2 + 2).y);
+        }
+    }
+
+    private static List<ПараXY> getAdamsIntra(double step) {
         double alpha = 1;
         double beta = 1;
-        double step = 0.01;
         double x = 0;
         double y = 0;
         double eps = 0.000001;
@@ -95,11 +129,35 @@ public class AdamsMethod {
         y = y + rungeKuttaMethod.find(step, уравнение, x, y);
         x = x + step;
         System.out.printf("%.2f   %.2f   %.2f   %.10f\n", alpha, beta, x, y);
-        adamsIntra(alpha, beta, step, x, y, b, η, уравнение, xOld, yOld);
+        return adamsIntra(alpha, beta, step, x, y, b, η, уравнение, xOld, yOld);
     }
 
-    private static void adamsExtra(double alpha, double beta, double step, double x, double y, double b, double[] η, Уравнение уравнение, double xOld, double yOld) {
+    private static List<ПараXY> getAdamsExtra(double step) {
+        double alpha = 1;
+        double beta = 1;
+        double x = 0;
+        double y = 0;
+        double eps = 0.000001;
+        double b = 0.9;
+        double[] η = new double[2];
+//      Уравнение уравнение = new МоеУравнение(alpha, beta);
+        Уравнение уравнение = new НАШЕУравнение(alpha, beta);
+
         double delta;
+
+        double xOld = x;
+        double yOld = y;
+        System.out.printf("alpha  beta   x      y\n");
+        System.out.printf("%.2f   %.2f   %.2f   %.10f\n", alpha, beta, x, y);
+        y = y + rungeKuttaMethod.find(step, уравнение, x, y);
+        x = x + step;
+        System.out.printf("%.2f   %.2f   %.2f   %.10f\n", alpha, beta, x, y);
+        return adamsExtra(alpha, beta, step, x, y, b, η, уравнение, xOld, yOld);
+    }
+
+    private static List<ПараXY> adamsExtra(double alpha, double beta, double step, double x, double y, double b, double[] η, Уравнение уравнение, double xOld, double yOld) {
+        double delta;
+        List<ПараXY> result = new ArrayList<>();
         while (x <= b) {
             η[0] = step * уравнение.f(xOld, yOld);
             η[1] = step * уравнение.f(x, y);
@@ -108,8 +166,10 @@ public class AdamsMethod {
             delta = η[1] - η[0];
             y = y + η[1] + delta/2;
             x = x + step;
-            System.out.printf("%.2f   %.2f   %.2f   %.6f\n", alpha, beta, x, y);
+            System.out.printf("%.2f   %.2f   %.4f   %.14f\n", alpha, beta, x, y);
+            result.add(new ПараXY(x, y));
         }
+        return result;
     }
 
 
@@ -123,8 +183,9 @@ public class AdamsMethod {
         return y;
     }
 
-    private static void adamsIntra(double alpha, double beta, double step, double x, double y, double b, double[] η, Уравнение уравнение, double xOld, double yOld) {
+    private static List<ПараXY> adamsIntra(double alpha, double beta, double step, double x, double y, double b, double[] η, Уравнение уравнение, double xOld, double yOld) {
         double delta;
+        List<ПараXY> result = new ArrayList<>();
         while (x < b) {
             η[0] = step * уравнение.f(x, y);
             double yNew = adamsExtraOne(step, x, y, уравнение, xOld, yOld);
@@ -135,6 +196,8 @@ public class AdamsMethod {
             y = y + η[1] - delta/2;
             x = x + step;
             System.out.printf("%.2f   %.2f   %.4f   %.14f\n", alpha, beta, x, y);
+            result.add(new ПараXY(x, y));
         }
+        return result;
     }
 }
